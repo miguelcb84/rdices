@@ -1,6 +1,14 @@
 #' Create a dice function that rolls a dice of the given number of sides.
 #'
-#' @param nside number of sides of the dices that will be created
+#' @param nside number of sides of the dice that will be created 
+#' @examples 
+#' require(dices)
+#' # create a six-sides dice
+#' dice <- makedice(2)
+#' dice(1) # roll it once
+#' dice(2) # roll it twice more
+#' 
+#' @author Miguel Coronado (miguelcb84@@gmail.com)
 #' @return function
 makedice <- function(nside){
   dice <- function(n = 1){
@@ -12,37 +20,98 @@ makedice <- function(nside){
 
 #' Roll the dice a number of times given and sum the result obtained
 #' 
-#' @param nside Number of sides of the dice to roll
-#' @param n number of dices to roll. Alternatively, this param may be a
-#'  vector: each elemen contains the number of dices that will be rolled for 
-#'  that experiment. For instance, in order to roll 2 dices four times, use 
-#'  the param \code{rep(2, len=4)}
-#' @return the sum of the results of each dice rolled. In case the function 
+#' @usage
+#'  \code{roll(nside, ndice, times)}
+#'  
+#'  \code{roll(nside, n)} 
+#' 
+#' @param nside number of sides of the dice to roll
+#' @param ndice numer of dices to roll
+#' @param times number of rolls -how many times the experiment is repeated
+#' @param n number of dices to roll. Optionally this param may be a
+#'  vector to set more than more experiment
+#' 
+#' @details It makes a roll where the number of dices and the type of them 
+#'  is given. All dices must be of the same type, i.e. they all have the same 
+#'  number od sides.
+#'  
+#'  
+#'  Alternatively, in order to make more than one roll, a vector of numerics
+#'  may be given as \code{n} param. The number of each element indicates the 
+#'  number of dices rolled in each experiment. For instance, in order to 
+#'  roll two dices four times, use the param \code{rep(2, len=4)}
+#'   
+#' @author Miguel Coronado (miguelcb84@@gmail.com)
+#' @return \code{roll} returns the sum of the results of each dice rolled. In case the function 
 #'  was called with a vector of experiments as param n, a vector ir returned
 #'  with the results for each experiment
+#'  
+#' @examples
+#' require(dices)
+#' # Make a roll with two dices of six sides
+#' roll(6,2)
+#' roll(6,2,1)
+#' 
+#' # Make four rolls with two dices of six sides
+#' roll(6, rep(2, len=4))
+#' roll(6, 2, 4)
+#' 
+#' # Make four rolls each one with one dice more starting with one
+#' roll(6, 1:4)
+#' 
 roll <- function(nside, n){
   dice <- makedice(nside)
   roll <- lapply(X=n, FUN=dice)
-  #print(roll)
   sapply(roll, FUN=sum)
 }
-
 
 roll <- function(nside, ndice, times){
   dice <- makedice(nside)
   X <- rep(ndice, len=times)
   roll <- lapply(X=X, FUN=dice)
-  #print(roll)
   sapply(roll, FUN=sum)
 }
 
 
+#' Random rolls of dices of a certain number of sides
+#' 
+#' @param times number of observations
+#' @param nside number of sides of the dices
+#' @param ndice number of dices rolled in each observation
+#' 
+#' @author Miguel Coronado (miguelcb84@@gmail.com)
+#' @return \code{rdices} returns a vector with the sum of the results of the 
+#'  dices for each observation
+#'  
+#' @examples
+#' require(dices)
+#' # Make a hundred observations of two dices of six sides
+#' roll(100, 6,2)
+#' 
 rdices <- function(times, nside, ndice){
   roll(nside, ndice, times)
 }
 
-
-
+#' Generate all different possible combinations of a roll.
+#' @param nside number of sides of the dices
+#' @param ndice number of dices rolled in each observation
+#' 
+#' @details The density information is included in the results, so each 
+#'  results appears as many times accordint to the theoretical probability.
+#' 
+#' @author Miguel Coronado (miguelcb84@@gmail.com)
+#' @return A vector with the sums of the results of each combination
+#' 
+#' @examples
+#' require(dices)
+#' # All possible results
+#' res <- tdice(6,3)
+#' 
+#' table(res) # statistical table
+#' 
+#' plot(res) # plot the results
+#' plot(table(res)) # plot the results
+#' 
 tdices <- function(nside, ndice){
   combs <- nside^ndice
   data <- rep(0, combs*ndice)
@@ -56,9 +125,11 @@ tdices <- function(nside, ndice){
   }
   
   data <- matrix(data, ncol=ndice)
-  apply(data, 1, sum)
+  table(apply(data, 1, sum))
 }
 
+
+#' Density distribution 
 ddices <- function(x, nside, ndice){
   data <- tdices(nside, ndice)
   data <- table(data)
@@ -83,7 +154,9 @@ ddices <- function(x, nside, ndice){
   ret
 }
 
-pdices <- function(x, nside, ndice){
+
+#' Distribution function 
+pdices <- function(q, nside, ndice){
   # Generate the data
   data <- tdices(nside, ndice)
   # Create statistical table
@@ -97,7 +170,7 @@ pdices <- function(x, nside, ndice){
   df$NFreq <- df$Freq/(nside^ndice) #
   
   # 
-  ret <- lapply(x, function(x) { df$NFreq[df$data<=x] })
+  ret <- lapply(q, function(x) { df$NFreq[df$data<=x] })
   ret <- sapply(ret, sum)
   ret[is.na(ret)] <- 0
   ret
