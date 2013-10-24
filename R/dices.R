@@ -1,6 +1,13 @@
 #' Create a dice function that rolls a dice of the given number of sides.
 #'
 #' @param nside number of sides of the dice that will be created 
+#' 
+#' @details The function that makedice produce may be called with just 
+#'  one argument for the number of times the dice is rolled. The value
+#'  that fucntion return is a vector with the resulting value of each roll.
+#'  
+#'  For more complex rolls with more than one dice see \code{\link{roll}} function.
+#' 
 #' @examples 
 #' require(dices)
 #' # create a six-sides dice
@@ -9,7 +16,10 @@
 #' dice(2) # roll it twice more
 #' 
 #' @author Miguel Coronado (miguelcb84@@gmail.com)
-#' @return function
+#' @return A function
+#' 
+#' @seealso \code{\link{roll}} 
+#' 
 makedice <- function(nside){
   dice <- function(n = 1){
     sample(1:nside, n, replace = TRUE)
@@ -73,34 +83,52 @@ roll <- function(nside, ndice, times){
 }
 
 
-#' Random rolls of dices of a certain number of sides
+#' Density, distribution function, statistical space and random generation 
+#' for distribution based on dice rolling.
 #' 
-#' @param times number of observations
-#' @param nside number of sides of the dices
-#' @param ndice number of dices rolled in each observation
-#' 
-#' @author Miguel Coronado (miguelcb84@@gmail.com)
-#' @return \code{rdices} returns a vector with the sum of the results of the 
-#'  dices for each observation
+#' @usage
+#'  \code{tdices(nside, ndice)}
 #'  
-#' @examples
-#' require(dices)
-#' # Make a hundred observations of two dices of six sides
-#' roll(100, 6,2)
+#'  \code{rdices(times, nside, ndice)}
+#'  
+#'  \code{ddices(x, nside, ndice)}
+#'  
+#'  \code{pdices(q, nside, ndice)}
 #' 
-rdices <- function(times, nside, ndice){
-  roll(nside, ndice, times)
-}
-
-#' Generate all different possible combinations of a roll.
-#' @param nside number of sides of the dices
-#' @param ndice number of dices rolled in each observation
+#' @param nside number of sides of the dices.
+#' @param ndice number of dices rolled in each observation.
+#' @param times number of observations. If \code{length(times) > 1}, the length 
+#'  is taken to be the number required.
+#' @param x vector of quantiles.
+#' @param q vector of quantiles.
 #' 
-#' @details The density information is included in the results, so each 
+#' @details 
+#'  \code{tdices} generates all different possible combinations of a roll for 
+#'  the given number of dices of the number sides.
+#'  The density information is included in the results, so each 
 #'  results appears as many times accordint to the theoretical probability.
+#'  
+#'  \code{rdices} generates random rolls of the given number of dices of the 
+#'  number sides.
 #' 
-#' @author Miguel Coronado (miguelcb84@@gmail.com)
-#' @return A vector with the sums of the results of each combination
+#'  The random variable for dice rolling is defined by the number of dices and
+#'  their number of sides. 
+#'  
+#'  Density is given by the frequency of appearance of a given result in the 
+#'  statistical outcome returned by \code{tdices} (the statistical space), i.e 
+#'  the ratio of times a result appear in the space and the total number of 
+#'  results.  
+#' 
+#' @author Miguel Coronado \email{miguelcb84@@gmail.com}
+#' @return 
+#' \code{tdices} A vector with the sums of the results of each combination
+#' 
+#' \code{rdices} returns a vector with the sum of the results of the 
+#'  dices for each observation
+#' 
+#' The legth of the result is determined by \code{times} for \code{rbinom}, 
+#' the number of different result in the space for \code{tdices},
+#' and is the length of x or q for the other functions.
 #' 
 #' @examples
 #' require(dices)
@@ -108,10 +136,24 @@ rdices <- function(times, nside, ndice){
 #' res <- tdice(6,3)
 #' 
 #' table(res) # statistical table
-#' 
 #' plot(res) # plot the results
 #' plot(table(res)) # plot the results
 #' 
+#' # Make a hundred observations of two dices of six sides
+#' rdices(100, 6,2)
+#' rdices(rep(0, len=100), 6,2)
+#' 
+#' # What is the probability of obtaining an exact result of 7 when rolling two dices?
+#' ddices(7, 6, 2)
+#' 
+#' # Compute P(5 <= X <= 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' sum(ddices(5:8, 6, 2))
+#' 
+#' # Compute P(X < 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' pdices(7, 6, 2)
+#' 
+#' # Compute P(X > 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' 1 - pdices(8, 6, 2)
 tdices <- function(nside, ndice){
   combs <- nside^ndice
   data <- rep(0, combs*ndice)
@@ -128,8 +170,153 @@ tdices <- function(nside, ndice){
   table(apply(data, 1, sum))
 }
 
+#' Density, distribution function, statistical space and random generation 
+#' for distribution based on dice rolling.
+#' 
+#' @usage
+#'  \code{tdices(nside, ndice)}
+#'  
+#'  \code{rdices(times, nside, ndice)}
+#'  
+#'  \code{ddices(x, nside, ndice)}
+#'  
+#'  \code{pdices(q, nside, ndice)}
+#' 
+#' @param nside number of sides of the dices.
+#' @param ndice number of dices rolled in each observation.
+#' @param times number of observations. If \code{length(times) > 1}, the length 
+#'  is taken to be the number required.
+#' @param x vector of quantiles.
+#' @param q vector of quantiles.
+#' 
+#' @details 
+#'  \code{tdices} generates all different possible combinations of a roll for 
+#'  the given number of dices of the number sides.
+#'  The density information is included in the results, so each 
+#'  results appears as many times accordint to the theoretical probability.
+#'  
+#'  \code{rdices} generates random rolls of the given number of dices of the 
+#'  number sides.
+#' 
+#'  The random variable for dice rolling is defined by the number of dices and
+#'  their number of sides. 
+#'  
+#'  Density is given by the frequency of appearance of a given result in the 
+#'  statistical outcome returned by \code{tdices} (the statistical space), i.e 
+#'  the ratio of times a result appear in the space and the total number of 
+#'  results.  
+#' 
+#' @author Miguel Coronado \email{miguelcb84@@gmail.com}
+#' @return 
+#' \code{tdices} A vector with the sums of the results of each combination
+#' 
+#' \code{rdices} returns a vector with the sum of the results of the 
+#'  dices for each observation
+#' 
+#' The legth of the result is determined by \code{times} for \code{rbinom}, 
+#' the number of different result in the space for \code{tdices},
+#' and is the length of x or q for the other functions.
+#' 
+#' @examples
+#' require(dices)
+#' # All possible results
+#' res <- tdice(6,3)
+#' 
+#' table(res) # statistical table
+#' plot(res) # plot the results
+#' plot(table(res)) # plot the results
+#' 
+#' # Make a hundred observations of two dices of six sides
+#' rdices(100, 6,2)
+#' rdices(rep(0, len=100), 6,2)
+#' 
+#' # What is the probability of obtaining an exact result of 7 when rolling two dices?
+#' ddices(7, 6, 2)
+#' 
+#' # Compute P(5 <= X <= 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' sum(ddices(5:8, 6, 2))
+#' 
+#' # Compute P(X < 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' pdices(7, 6, 2)
+#' 
+#' # Compute P(X > 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' 1 - pdices(8, 6, 2)
+rdices <- function(times, nside, ndice){
+  if(length(times)>1) times <- length(times)
+  roll(nside, ndice, times)
+}
 
-#' Density distribution 
+#' Density, distribution function, statistical space and random generation 
+#' for distribution based on dice rolling.
+#' 
+#' @usage
+#'  \code{tdices(nside, ndice)}
+#'  
+#'  \code{rdices(times, nside, ndice)}
+#'  
+#'  \code{ddices(x, nside, ndice)}
+#'  
+#'  \code{pdices(q, nside, ndice)}
+#' 
+#' @param nside number of sides of the dices.
+#' @param ndice number of dices rolled in each observation.
+#' @param times number of observations. If \code{length(times) > 1}, the length 
+#'  is taken to be the number required.
+#' @param x vector of quantiles.
+#' @param q vector of quantiles.
+#' 
+#' @details 
+#'  \code{tdices} generates all different possible combinations of a roll for 
+#'  the given number of dices of the number sides.
+#'  The density information is included in the results, so each 
+#'  results appears as many times accordint to the theoretical probability.
+#'  
+#'  \code{rdices} generates random rolls of the given number of dices of the 
+#'  number sides.
+#' 
+#'  The random variable for dice rolling is defined by the number of dices and
+#'  their number of sides. 
+#'  
+#'  Density is given by the frequency of appearance of a given result in the 
+#'  statistical outcome returned by \code{tdices} (the statistical space), i.e 
+#'  the ratio of times a result appear in the space and the total number of 
+#'  results.  
+#' 
+#' @author Miguel Coronado \email{miguelcb84@@gmail.com}
+#' @return 
+#' \code{tdices} A vector with the sums of the results of each combination
+#' 
+#' \code{rdices} returns a vector with the sum of the results of the 
+#'  dices for each observation
+#' 
+#' The legth of the result is determined by \code{times} for \code{rbinom}, 
+#' the number of different result in the space for \code{tdices},
+#' and is the length of x or q for the other functions.
+#' 
+#' @examples
+#' require(dices)
+#' # All possible results
+#' res <- tdice(6,3)
+#' 
+#' table(res) # statistical table
+#' plot(res) # plot the results
+#' plot(table(res)) # plot the results
+#' 
+#' # Make a hundred observations of two dices of six sides
+#' rdices(100, 6,2)
+#' rdices(rep(0, len=100), 6,2)
+#' 
+#' # What is the probability of obtaining an exact result of 7 when rolling two dices?
+#' ddices(7, 6, 2)
+#' 
+#' # Compute P(5 <= X <= 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' sum(ddices(5:8, 6, 2))
+#' 
+#' # Compute P(X < 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' pdices(7, 6, 2)
+#' 
+#' # Compute P(X > 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' 1 - pdices(8, 6, 2)
 ddices <- function(x, nside, ndice){
   data <- tdices(nside, ndice)
   data <- table(data)
@@ -154,8 +341,77 @@ ddices <- function(x, nside, ndice){
   ret
 }
 
-
-#' Distribution function 
+#' Density, distribution function, statistical space and random generation 
+#' for distribution based on dice rolling.
+#' 
+#' @usage
+#'  \code{tdices(nside, ndice)}
+#'  
+#'  \code{rdices(times, nside, ndice)}
+#'  
+#'  \code{ddices(x, nside, ndice)}
+#'  
+#'  \code{pdices(q, nside, ndice)}
+#' 
+#' @param nside number of sides of the dices.
+#' @param ndice number of dices rolled in each observation.
+#' @param times number of observations. If \code{length(times) > 1}, the length 
+#'  is taken to be the number required.
+#' @param x vector of quantiles.
+#' @param q vector of quantiles.
+#' 
+#' @details 
+#'  \code{tdices} generates all different possible combinations of a roll for 
+#'  the given number of dices of the number sides.
+#'  The density information is included in the results, so each 
+#'  results appears as many times accordint to the theoretical probability.
+#'  
+#'  \code{rdices} generates random rolls of the given number of dices of the 
+#'  number sides.
+#' 
+#'  The random variable for dice rolling is defined by the number of dices and
+#'  their number of sides. 
+#'  
+#'  Density is given by the frequency of appearance of a given result in the 
+#'  statistical outcome returned by \code{tdices} (the statistical space), i.e 
+#'  the ratio of times a result appear in the space and the total number of 
+#'  results.  
+#' 
+#' @author Miguel Coronado \email{miguelcb84@@gmail.com}
+#' @return 
+#' \code{tdices} A vector with the sums of the results of each combination
+#' 
+#' \code{rdices} returns a vector with the sum of the results of the 
+#'  dices for each observation
+#' 
+#' The legth of the result is determined by \code{times} for \code{rbinom}, 
+#' the number of different result in the space for \code{tdices},
+#' and is the length of x or q for the other functions.
+#' 
+#' @examples
+#' require(dices)
+#' # All possible results
+#' res <- tdice(6,3)
+#' 
+#' table(res) # statistical table
+#' plot(res) # plot the results
+#' plot(table(res)) # plot the results
+#' 
+#' # Make a hundred observations of two dices of six sides
+#' rdices(100, 6,2)
+#' rdices(rep(0, len=100), 6,2)
+#' 
+#' # What is the probability of obtaining an exact result of 7 when rolling two dices?
+#' ddices(7, 6, 2)
+#' 
+#' # Compute P(5 <= X <= 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' sum(ddices(5:8, 6, 2))
+#' 
+#' # Compute P(X < 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' pdices(7, 6, 2)
+#' 
+#' # Compute P(X > 8) for X, a random variable of \code{Dices(ndice=2, nside=6)}
+#' 1 - pdices(8, 6, 2)
 pdices <- function(q, nside, ndice){
   # Generate the data
   data <- tdices(nside, ndice)
