@@ -23,6 +23,10 @@ for distribution based on dice rolling.}
   \item{x}{vector of quantiles.}
 
   \item{q}{vector of quantiles.}
+
+  \item{make.table}{(optional) default to TRUE. It
+  indicates whether the results of \code{tdices} should be
+  wrapped in a \code{table}.}
 }
 \value{
   \code{tdices} A vector with the sums of the results of
@@ -62,8 +66,9 @@ for distribution based on dice rolling.}
 \examples{
 require(dices)
 # All possible results
-res <- tdice(6,3)
+res <- tdices(6,3)
 
+summary(res) # Smmary
 table(res) # statistical table
 plot(res) # plot the results
 plot(table(res)) # plot the results
@@ -77,12 +82,26 @@ ddices(7, 6, 2)
 
 # Compute P(5 <= X <= 8) for X, a random variable of \\code{Dices(ndice=2, nside=6)}
 sum(ddices(5:8, 6, 2))
+# or alternatively
+pdices(8, 6, 2) - pdices(4, 6, 2)
+# or
+diff(pdices(c(4,8), 6, 2))
 
 # Compute P(X < 8) for X, a random variable of \\code{Dices(ndice=2, nside=6)}
 pdices(7, 6, 2)
 
 # Compute P(X > 8) for X, a random variable of \\code{Dices(ndice=2, nside=6)}
 1 - pdices(8, 6, 2)
+
+# Print density and distribution
+dev.off()
+p <- pdices(1:20,6,3)
+d <- ddices(1:20,6,3)
+par(mar=c(3, 6, 3, 3))
+plot(d, type="o", ylab=NA, xlab=NA)
+par(new=TRUE)
+plot(p, type="o", ylab=NA, axes=FALSE)
+axis(side=2, line=2.5, ylim=pretty(range(p)))
 }
 \author{
   Miguel Coronado \email{miguelcb84@gmail.com}
