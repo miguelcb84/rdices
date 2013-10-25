@@ -30,6 +30,10 @@ Usage overview
 
 For further explanation of the each function see the R documentation.
 
+### Examples
+
+All examples in this file are executable R code. This file is written using specific R markadown language, that can be executed when rendered.
+
 Helper Functions
 ----------------------------------------------
 
